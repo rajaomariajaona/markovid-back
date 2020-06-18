@@ -1,7 +1,7 @@
 
 import { Controller } from "./Controller";
 import { Fokontany } from '../entities/Fokontany';
-import { Repository, createConnection, Connection } from 'typeorm';
+import { Repository, createConnection, Connection, FindManyOptions } from 'typeorm';
 import { ormconfig } from '../config';
 import { Router } from 'express';
 import { Request } from 'express';
@@ -28,50 +28,46 @@ export default class FokontanyController extends Controller {
     }
 
     async addPost(router: Router): Promise<void> {
-        await this.postFokontany(router)
     }
 
     async addDelete(router: Router): Promise<void> {
-        await this.deleteById(router);
     }
 
     async addGet(router: Router): Promise<void> {
-        await this.getAllFokontany(router)
         await this.getSingleFokontany(router)
     }
 
 
     async addPut(router: Router): Promise<void> {
-        await this.editFokontany(router);
-    }
-
-    private async getAllFokontany(router: Router): Promise<void> {
-        router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+        router.patch("/:id/cas-suspect", async (req, res, next) => {
             try {
-                var fokontanys: Fokontany[] = await this.fetchFokontanysFromDatabase()
-                await this.sendResponse(res, 200, { data: fokontanys })
-                next()
-            } catch (err) {
-                await this.passErrorToExpress(err, next)
+                let fk = await this.fokontanyRepository.findOneOrFail(req.params.id)
+                fk.casSuspect = req.body.cas
+                await this.fokontanyRepository.save(fk)
+            } catch (error) {
+                await this.sendResponse(res, 404, { message: "Fokontany Not Found" })
             }
         })
-    }
-
-    private async fetchFokontanysFromDatabase(): Promise<Fokontany[]> {
-        return await this.fokontanyRepository.find()
-    }
-
-    private async getSingleFokontany(router: Router) {
-        router.get("/:id", async (req, res, next) => {
+        router.patch("/:id/cas-confirme", async (req, res, next) => {
             try {
-                var fokontany: Fokontany = await this.fokontanyRepository.findOneOrFail()
-                await this.sendResponse(res, 200, fokontany)
-            } catch (err) {
+                let fk = await this.fokontanyRepository.findOneOrFail(req.params.id)
+                fk.casConfirme = req.body.cas
+                await this.fokontanyRepository.save(fk)
+            } catch (error) {
                 await this.sendResponse(res, 404, { message: "Fokontany Not Found" })
             }
         })
     }
-    async postFokontany(router: Router) {
-    }
 
+    private async getSingleFokontany(router: Router) {
+        router.get("/:nom", async (req, res, next) => {
+            try {
+                var fokontany: Fokontany[] = await this.fokontanyRepository.createQueryBuilder("fokontany").select().where(`lower(fokontany.nom) like '%${req.params.nom.toLowerCase()}%'`).limit(10).getMany()
+                await this.sendResponse(res, 200, fokontany)
+            } catch (err) {
+                console.log(err)
+                await this.sendResponse(res, 404, { message: "Fokontany Not Found" })
+            }
+        })
+    }
 }

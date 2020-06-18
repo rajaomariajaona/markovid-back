@@ -18,11 +18,11 @@ export class Fokontany {
     casSuspect: number;
 
     @Column("integer", {
-        name: "cas_confirmee",
+        name: "cas_confirme",
         default: () => 0,
         nullable: false
     })
-    casConfirmee: number;
+    casConfirme: number;
 
     @Column({
         type: 'geography',
