@@ -17,7 +17,7 @@ export class CustomServer {
         this.app.use("/api", router)
         const http = createServer(this.app)
         http.listen(process.env.PORT || 3000)
-        console.log("Mtatitra is ONLINE ")
+        console.log("Markovid is ONLINE ")
         CustomServer.io = require('socket.io')(http);
         CustomServer.io.on('connection', (socket) => {
             socket.on("ajout room", (roomName) => {
