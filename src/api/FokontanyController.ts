@@ -42,21 +42,11 @@ export default class FokontanyController extends Controller {
 
 
     async addPut(router: Router): Promise<void> {
-        router.patch("/:id/cas-suspect", async (req, res, next) => {
+        router.patch("/:id/cas", async (req, res, next) => {
             try {
                 let fk = await this.fokontanyRepository.findOneOrFail(req.params.id)
-                fk.casSuspect = req.body.cas
-                await this.fokontanyRepository.save(fk)
-                CustomServer.io.emit("changes")
-                this.sendResponse(res, 200, { message: "Fokontany updated" })
-            } catch (error) {
-                await this.sendResponse(res, 404, { message: "Fokontany Not Found" })
-            }
-        })
-        router.patch("/:id/cas-confirme", async (req, res, next) => {
-            try {
-                let fk = await this.fokontanyRepository.findOneOrFail(req.params.id)
-                fk.casConfirme = req.body.cas
+                fk.casSuspect = req.body.casSuspect
+                fk.casConfirme = req.body.casConfirme
                 await this.fokontanyRepository.save(fk)
                 CustomServer.io.emit("changes")
                 this.sendResponse(res, 200, { message: "Fokontany updated" })
@@ -141,7 +131,7 @@ export default class FokontanyController extends Controller {
     private async getSingleFokontany(router: Router) {
         router.get("/", async (req, res, next) => {
             try {
-                var result = await getConnection().createEntityManager().query(`SELECT "Fokontany".id, "Fokontany"."nom","Fokontany".province, st_asgeojson(st_centroid("Fokontany".trace))::json as centre FROM (SELECT regexp_split_to_table(nom, ' ') as part, id FROM "Fokontany" ) as parsed JOIN "Fokontany" on parsed.id = "Fokontany".id GROUP BY "Fokontany".id ORDER BY min(part <-> '${req.query.nom}') ASC LIMIT 20;`)
+                var result = await getConnection().createEntityManager().query(`SELECT "Fokontany".id, "Fokontany"."nom","Fokontany".province, "Fokontany".cas_confirme as "casConfirme", "Fokontany".cas_suspect as "casSuspect", st_asgeojson(st_centroid("Fokontany".trace))::json as centre FROM (SELECT regexp_split_to_table(nom, ' ') as part, id FROM "Fokontany" ) as parsed JOIN "Fokontany" on parsed.id = "Fokontany".id GROUP BY "Fokontany".id ORDER BY min(part <-> '${req.query.nom}') ASC LIMIT 20;`)
                 await this.sendResponse(res, 200, result)
             } catch (err) {
                 console.log(err)
