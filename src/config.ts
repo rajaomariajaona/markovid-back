@@ -21,6 +21,7 @@ var connectionOptionHeroku: ConnectionOptions = {
     url: process.env.DATABASE_URL,
     synchronize: true,
     schema: "public",
+    ssl: true,
     entities: [
         "src/entities/**/*.ts"
     ],
