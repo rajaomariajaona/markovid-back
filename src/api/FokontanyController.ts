@@ -137,6 +137,8 @@ export default class FokontanyController extends Controller {
                         .select("fokontany.id", "id")
                         .addSelect("fokontany.nom", "nom")
                         .addSelect("fokontany.province", "province")
+                        .addSelect("fokontany.casConfirme", "casConfirme")
+                        .addSelect("fokontany.casSuspect", "casSuspect")
                         .addSelect("st_asgeojson(st_centroid(fokontany.trace))::json", "centre")
                         .where(`lower(fokontany.nom) like '%${req.query.nom.toLowerCase()}%'`)
                         .limit(15)
