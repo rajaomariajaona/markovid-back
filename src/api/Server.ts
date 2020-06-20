@@ -5,6 +5,7 @@ import router from './routerApi';
 import { createConnection } from 'typeorm';
 import { ormconfig } from '../config';
 import { createServer } from 'http';
+const path = require('path')
 export class CustomServer {
     app = express()
     static io
@@ -15,6 +16,7 @@ export class CustomServer {
         this.app.use(bodyParser.json())
         this.app.use("/api", compression())
         this.app.use("/api", router)
+        this.app.use(express.static(path.join(__dirname, "../../backoffice")))
         const http = createServer(this.app)
         http.listen(process.env.PORT || 3000)
         CustomServer.io = require('socket.io')(http);
