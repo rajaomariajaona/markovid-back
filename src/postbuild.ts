@@ -14,6 +14,9 @@ async function pushData() {
             zipEntries.forEach(async function (zipEntry) {
                 if (zipEntry.entryName == "insert.sql") {
                     await connection.createEntityManager().query(zipEntry.getData().toString('utf8'))
+                    if(process.env.DATABASE_URL){
+                        await connection.createEntityManager().query(`DELETE FROM "Fokontany" WHERE province <> 'Antananarivo'`)
+                    }
                 }
             });
         }

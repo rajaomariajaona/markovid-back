@@ -4,6 +4,7 @@ export class Fokontany {
     @Column({ type: "character varying", name: "id", primary: true, length: 100 })
     id: string;
 
+    @Index({})
     @Column("character varying", { name: "nom", length: 100 })
     nom: string;
 
