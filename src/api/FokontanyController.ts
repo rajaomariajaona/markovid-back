@@ -131,16 +131,7 @@ export default class FokontanyController extends Controller {
     private async getSingleFokontany(router: Router) {
         router.get("/", async (req, res, next) => {
             try {
-                let fokontany =
-                    await this.fokontanyRepository
-                        .createQueryBuilder("fokontany")
-                        .select("fokontany.id", "id")
-                        .addSelect("fokontany.nom", "nom")
-                        .addSelect("fokontany.province", "province")
-                        .addSelect("st_asgeojson(st_centroid(fokontany.trace))::json", "centre")
-                        .where(`lower(fokontany.nom) like '%${req.query.nom.toLowerCase()}%'`)
-                        .limit(15)
-                        .getRawMany()
+                var fokontany = await getConnection().createEntityManager().query(`SELECT "Fokontany".id, "Fokontany"."nom","Fokontany".province, "Fokontany".cas_confirme as "casConfirme", "Fokontany".cas_suspect as "casSuspect", st_asgeojson(st_centroid("Fokontany".trace))::json as centre FROM (SELECT regexp_split_to_table(nom, ' ') as part, id FROM "Fokontany" ) as parsed JOIN "Fokontany" on parsed.id = "Fokontany".id GROUP BY "Fokontany".id ORDER BY min(part <-> '${req.query.nom}') ASC LIMIT 20;`)
                 await this.sendResponse(res, 200, fokontany)
             } catch (err) {
                 console.log(err)
