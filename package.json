@@ -33,7 +33,7 @@
       "tau-prolog": "^0.2.81",
       "ts-node": "^8.6.2",
       "ts-node-dev": "^1.0.0-pre.44",
-      "typeorm": "0.2.21",
+      "typeorm": "0.2.25",
       "typescript": "3.7.2"
    },
    "devDependencies": {
